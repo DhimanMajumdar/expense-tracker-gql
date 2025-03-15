@@ -7,6 +7,7 @@ import { buildContext } from "graphql-passport";
 import express from "express";
 import http from "http";
 import cors from "cors";
+import fs from "fs"; // ✅ Import fs to check if frontend build exists
 
 import passport from "passport";
 import session from "express-session";
@@ -34,13 +35,14 @@ const store = new MongoDBStore({
 });
 
 store.on("error", (err) => console.log(err));
+
 app.use(
 	session({
 		secret: process.env.SESSION_SECRET,
-		resave: false, // This option specifies whether to save the session to the store on every request
+		resave: false, // Prevent unnecessary resaving of sessions
 		saveUninitialized: false,
 		cookie: {
-			maxAge: 1000 * 60 * 60 * 24 * 7,
+			maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
 			httpOnly: true,
 		},
 		store: store,
@@ -74,14 +76,22 @@ app.use(
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// ✅ Fix: Serve static frontend files
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// ✅ Fix: Ensure frontend build exists before serving
+const frontendPath = path.join(__dirname, "../frontend/dist");
 
-app.get("*", (req, res) => {
-	res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-});
+if (fs.existsSync(frontendPath)) {
+	console.log("✅ Serving frontend from:", frontendPath);
+	app.use(express.static(frontendPath));
+
+	app.get("*", (req, res) => {
+		res.sendFile(path.join(frontendPath, "index.html"));
+	});
+} else {
+	console.warn("⚠️ Warning: frontend/dist not found. Make sure to build the frontend.");
+}
+
+await connectDB();
 
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
-await connectDB();
 
 console.log(`🚀 Server ready at http://localhost:4000/graphql`);
