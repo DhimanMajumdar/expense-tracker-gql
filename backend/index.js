@@ -16,7 +16,7 @@ import mergedResolvers from "./resolvers/index.js";
 import mergedTypeDefs from "./typeDefs/index.js";
 
 import dotenv from "dotenv";
-import connectDB from "./db/connectDb.js";
+import connectDB from "./db/connectDB.js";
 import { configurePassport } from "./passport/passport.config.js";
 
 import { fileURLToPath } from "url"; // ✅ Fix for `__dirname` issue
