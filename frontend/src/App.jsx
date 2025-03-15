@@ -1,14 +1,42 @@
-import "./index.css"
+import { Navigate, Route, Routes } from "react-router-dom";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/SignUpPage";
+import TransactionPage from "./pages/TransactionPage";
+import NotFoundPage from "./pages/NotFoundPage";
+import Header from "./components/ui/Header";
+import { useQuery } from "@apollo/client";
+import { GET_AUTHENTICATED_USER } from "./graphql/queries/user.query";
+import { Toaster } from "react-hot-toast";
 
 function App() {
+	const { loading, data } = useQuery(GET_AUTHENTICATED_USER);
 
-  return (
-    <>
-       <h1 class="text-3xl font-bold underline">
-    Hello world!
-  </h1>
-    </>
-  )
+	if (loading) return null;
+
+	return (
+		<div
+			className="min-h-screen bg-white bg-fixed bg-center sm:bg-contain md:bg-cover"
+			style={{
+				backgroundImage:
+					"url('https://static.vecteezy.com/system/resources/thumbnails/049/080/521/small_2x/modern-geometric-square-shape-seamlessly-repeatable-pattern-with-a-white-background-grid-mesh-lattice-pattern-vector.jpg')",
+				backgroundRepeat: "repeat",
+			}}
+		>
+			{data?.authUser && <Header />}
+			<Routes>
+				<Route path="/" element={data.authUser ? <HomePage /> : <Navigate to="/login" />} />
+				<Route path="/login" element={!data.authUser ? <LoginPage /> : <Navigate to="/" />} />
+				<Route path="/signup" element={!data.authUser ? <SignUpPage /> : <Navigate to="/" />} />
+				<Route
+					path="/transaction/:id"
+					element={data.authUser ? <TransactionPage /> : <Navigate to="/login" />}
+				/>
+				<Route path="*" element={<NotFoundPage />} />
+			</Routes>
+			<Toaster />
+		</div>
+	);
 }
 
-export default App
+export default App;
