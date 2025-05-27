@@ -1,7 +1,7 @@
 # 💰 GraphSpense GQL – The Future of Expense Tracking
 
 **Tech Stack:** React | Apollo Client | Node.js | Express | GraphQL | MongoDB | Render  
-**Live App:** [🚀 Try GraphSpense GQL](https://lnkd.in/gxAjYDuK)
+**Live App:** [🚀 Try GraphSpense GQL](https://expense-tracker-gql-wpus.onrender.com/)
 
 ---
 
